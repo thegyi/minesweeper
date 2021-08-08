@@ -1,0 +1,80 @@
+#include "board.h"
+#include <QGridLayout>
+#include <iostream>
+
+Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(columnCount), countOfBombs(bombs)
+{
+    std::vector<bool> Bombs;
+    for(unsigned int i = 0; i < rows*columns; i++) {
+        if(i < countOfBombs)
+            Bombs.push_back(true);
+        else
+            Bombs.push_back(false);
+    }
+    std::random_shuffle(Bombs.begin(), Bombs.end());
+
+    QGridLayout *layout = new QGridLayout(this);
+    int row = 0;
+    int column = 0;
+    for(unsigned int i = 0; i < rows*columns; ++i) {
+        if(column >= columns) {
+            row++;
+            column = 0;
+        }
+        square *tmp = new square(row, column, this);
+        if(Bombs[i])
+            tmp->setBomb(true);
+        squares.push_back(tmp);
+        layout->addWidget(tmp, row, column);
+        connect(tmp, &square::onClick, this, &Board::handleClick);
+        ++column;
+
+    }
+    this->setLayout(layout);
+}
+
+Board::~Board()
+{
+    for(unsigned int i = 0; i < squares.size(); i++) {
+        delete squares[i];
+        squares[i] = nullptr;
+    }
+    squares.clear();
+}
+
+void Board::handleClick(QString value)
+{
+    if(value == "Bomb") {
+        emit onClick(value);
+        return;
+    }
+
+    QStringList values = value.split(":");
+    int row = values[0].toInt();
+    int column = values[1].toInt();
+    int countOfNeighbourBombs = 0;
+    if(row >=1) {
+        if(squares[(row-1)*columns+column]->getBomb())
+            countOfNeighbourBombs++;
+        if(column >= 1 && squares[(row-1)*columns+column-1]->getBomb())
+            countOfNeighbourBombs++;
+        if(column < columns-1 && squares[(row-1)*columns+column+1]->getBomb())
+            countOfNeighbourBombs++;
+    }
+    if(row < rows-1) {
+        if(squares[(row+1)*columns+column]->getBomb())
+            countOfNeighbourBombs++;
+        if(column >= 1 && squares[(row+1)*columns+column-1]->getBomb())
+            countOfNeighbourBombs++;
+        if(column < columns-1 && squares[(row+1)*columns+column+1]->getBomb())
+            countOfNeighbourBombs++;
+    }
+    if(column >= 1 && squares[row*columns+column-1]->getBomb())
+        countOfNeighbourBombs++;
+    if(column < columns-1 && squares[row*columns+column+1]->getBomb())
+        countOfNeighbourBombs++;
+
+    squares[row*columns+column]->setText(QString::number(countOfNeighbourBombs));
+
+    //std::cout << "row:" << row << " column:" << column << std::endl;
+}
