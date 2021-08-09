@@ -41,3 +41,25 @@ void MainWindow::handleClick(QString value)
     msgBox.setText(value);
     msgBox.exec();
 }
+
+void MainWindow::on_action10x10_triggered()
+{
+    if(myboard)
+        delete myboard;
+    myboard = new Board(10,10,20);
+    QLayout *layout = ui->centralwidget->layout();
+    layout->addWidget(myboard);
+    connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
+}
+
+
+void MainWindow::on_action20x20_triggered()
+{
+    if(myboard)
+        delete myboard;
+    myboard = new Board(20,20,70);
+    QLayout *layout = ui->centralwidget->layout();
+    layout->addWidget(myboard);
+    connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
+}
+

@@ -21,5 +21,8 @@ private:
     Ui::MainWindow *ui;
 public slots:
     void handleClick(QString value);
+private slots:
+    void on_action10x10_triggered();
+    void on_action20x20_triggered();
 };
 #endif // MAINWINDOW_H

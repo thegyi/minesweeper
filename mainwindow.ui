@@ -26,11 +26,29 @@
      <x>0</x>
      <y>0</y>
      <width>946</width>
-     <height>24</height>
+     <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuNew">
+    <property name="title">
+     <string>New Game</string>
+    </property>
+    <addaction name="action10x10"/>
+    <addaction name="action20x20"/>
+   </widget>
+   <addaction name="menuNew"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action10x10">
+   <property name="text">
+    <string>10x10</string>
+   </property>
+  </action>
+  <action name="action20x20">
+   <property name="text">
+    <string>20x20</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
