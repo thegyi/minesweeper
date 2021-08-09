@@ -22,7 +22,13 @@ bool square::eventFilter(QObject *, QEvent *event)
     if (event->type() == QEvent::MouseButtonPress) {
         QMouseEvent *keyEvent = static_cast<QMouseEvent *>(event);
         if (keyEvent->button() == Qt::RightButton) {
+            if(text() == "B!") {
+                setText("-");
+                emit onClick("-B!");
+                return true;
+            }
             setText("B!");
+            emit onClick("B!");
             return true;
         }
         if(keyEvent->button() == Qt::LeftButton) {
@@ -33,4 +39,19 @@ bool square::eventFilter(QObject *, QEvent *event)
         }
     }
     return false;
+}
+
+void square::setCounter(int value)
+{
+    counter = value;
+}
+
+int square::getCounter()
+{
+    return counter;
+}
+
+void square::showNumber()
+{
+    setText(QString::number(counter));
 }

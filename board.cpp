@@ -2,9 +2,8 @@
 #include <QGridLayout>
 #include <iostream>
 
-Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(columnCount), countOfBombs(bombs)
+Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(columnCount), countOfBombs(bombs), markedAsBomb(0)
 {
-    std::vector<bool> Bombs;
     for(int i = 0; i < rows*columns; i++) {
         bombChecked.push_back(false);
         if(i < countOfBombs)
@@ -31,6 +30,18 @@ Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(c
         ++column;
 
     }
+
+    row = 0;
+    column = 0;
+    for(int i = 0; i < rows*columns; ++i) {
+        if(column >= columns) {
+            row++;
+            column = 0;
+        }
+        calculateNumber(row, column);
+        ++column;
+    }
+
     this->setLayout(layout);
 }
 
@@ -45,6 +56,18 @@ Board::~Board()
 
 void Board::handleClick(QString value)
 {
+    if(value == "B!") {
+        markedAsBomb++;
+        //setWindowTitle(QString::number(markedAsBomb));
+        emit onClick(value);
+        return;
+    }
+    if(value == "-B!") {
+        markedAsBomb--;
+        //setWindowTitle(QString::number(markedAsBomb));
+        emit onClick("B!");
+        return;
+    }
     if(value == "Bomb") {
         emit onClick(value);
         return;
@@ -61,37 +84,17 @@ void Board::checkBombCountAndDisplay(int row, int column, bool displayIfZero)
 {
     if(bombChecked[row*columns+column])
         return;
-    int countOfNeighbourBombs = 0;
-    if(row >=1) {
-        if(squares[(row-1)*columns+column]->getBomb())
-            countOfNeighbourBombs++;
-        if(column >= 1 && squares[(row-1)*columns+column-1]->getBomb())
-            countOfNeighbourBombs++;
-        if(column < columns-1 && squares[(row-1)*columns+column+1]->getBomb())
-            countOfNeighbourBombs++;
-    }
-    if(row < rows-1) {
-        if(squares[(row+1)*columns+column]->getBomb())
-            countOfNeighbourBombs++;
-        if(column >= 1 && squares[(row+1)*columns+column-1]->getBomb())
-            countOfNeighbourBombs++;
-        if(column < columns-1 && squares[(row+1)*columns+column+1]->getBomb())
-            countOfNeighbourBombs++;
-    }
-    if(column >= 1 && squares[row*columns+column-1]->getBomb())
-        countOfNeighbourBombs++;
-    if(column < columns-1 && squares[row*columns+column+1]->getBomb())
-        countOfNeighbourBombs++;
+    int countOfNeighbourBombs = calculateNumber(row, column);
 
     if(displayIfZero) {
         if(countOfNeighbourBombs == 0 && bombChecked[row*columns+column] == false) {
-            squares[row*columns+column]->setText(QString::number(countOfNeighbourBombs));
+            squares[row*columns+column]->showNumber();//setText(QString::number(countOfNeighbourBombs));
             squares[row*columns+column]->setEnabled(false);
             bombChecked[row*columns+column] = true;
         }
     }
     else {
-        squares[row*columns+column]->setText(QString::number(countOfNeighbourBombs));
+        squares[row*columns+column]->showNumber();//setText(QString::number(countOfNeighbourBombs));
         bombChecked[row*columns+column] = true;
     }
 
@@ -117,4 +120,57 @@ void Board::checkBombCountAndDisplay(int row, int column, bool displayIfZero)
 
         }
     }
+}
+
+int Board::calculateNumber(int row, int column)
+{
+    int countOfNeighbourBombs = 0;
+    if(row >=1) {
+        if(squares[(row-1)*columns+column]->getBomb())
+            countOfNeighbourBombs++;
+        if(column >= 1 && squares[(row-1)*columns+column-1]->getBomb())
+            countOfNeighbourBombs++;
+        if(column < columns-1 && squares[(row-1)*columns+column+1]->getBomb())
+            countOfNeighbourBombs++;
+    }
+    if(row < rows-1) {
+        if(squares[(row+1)*columns+column]->getBomb())
+            countOfNeighbourBombs++;
+        if(column >= 1 && squares[(row+1)*columns+column-1]->getBomb())
+            countOfNeighbourBombs++;
+        if(column < columns-1 && squares[(row+1)*columns+column+1]->getBomb())
+            countOfNeighbourBombs++;
+    }
+    if(column >= 1 && squares[row*columns+column-1]->getBomb())
+        countOfNeighbourBombs++;
+    if(column < columns-1 && squares[row*columns+column+1]->getBomb())
+        countOfNeighbourBombs++;
+
+    squares[row*columns+column]->setCounter(countOfNeighbourBombs);
+    return countOfNeighbourBombs;
+}
+
+bool Board::checkEnd()
+{
+    for(unsigned int i = 0; i < squares.size(); ++i) {
+        if(squares[i]->text() == "")
+            return false;
+    }
+    return true;
+}
+
+bool Board::checkWin()
+{
+    for(unsigned int i = 0; i < squares.size(); ++i) {
+        if(squares[i]->text() == "B!") {
+            if(Bombs[i] == false) {
+                return false;
+            }
+        } else {
+            if(Bombs[i] == true){
+                return false;
+            }
+        }
+    }
+    return true;
 }

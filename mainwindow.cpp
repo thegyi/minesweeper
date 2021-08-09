@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    myboard = new Board(20, 20, 5);
+    myboard = new Board(20, 20, 10);
     QLayout *layout = ui->centralwidget->layout();
     layout->addWidget(myboard);
     connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
@@ -24,8 +24,20 @@ MainWindow::~MainWindow()
 
 void MainWindow::handleClick(QString value)
 {
+    if(myboard->checkEnd()) {
+        QMessageBox msgBox;
+        if(myboard->checkWin())
+            msgBox.setText("WIN");
+        else
+            msgBox.setText("END");
+        msgBox.exec();
+        return;
+    }
+    if(value == "B!") {
+        setWindowTitle(QString::number(myboard->markedAsBomb));
+        return;
+    }
     QMessageBox msgBox;
     msgBox.setText(value);
     msgBox.exec();
-    std::cout<<value.toStdString()<<std::endl;
 }
