@@ -5,7 +5,8 @@
 Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(columnCount), countOfBombs(bombs)
 {
     std::vector<bool> Bombs;
-    for(unsigned int i = 0; i < rows*columns; i++) {
+    for(int i = 0; i < rows*columns; i++) {
+        bombChecked.push_back(false);
         if(i < countOfBombs)
             Bombs.push_back(true);
         else
@@ -16,7 +17,7 @@ Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(c
     QGridLayout *layout = new QGridLayout(this);
     int row = 0;
     int column = 0;
-    for(unsigned int i = 0; i < rows*columns; ++i) {
+    for(int i = 0; i < rows*columns; ++i) {
         if(column >= columns) {
             row++;
             column = 0;
@@ -52,6 +53,14 @@ void Board::handleClick(QString value)
     QStringList values = value.split(":");
     int row = values[0].toInt();
     int column = values[1].toInt();
+
+    checkBombCountAndDisplay(row, column);
+}
+
+void Board::checkBombCountAndDisplay(int row, int column, bool displayIfZero)
+{
+    if(bombChecked[row*columns+column])
+        return;
     int countOfNeighbourBombs = 0;
     if(row >=1) {
         if(squares[(row-1)*columns+column]->getBomb())
@@ -74,7 +83,38 @@ void Board::handleClick(QString value)
     if(column < columns-1 && squares[row*columns+column+1]->getBomb())
         countOfNeighbourBombs++;
 
-    squares[row*columns+column]->setText(QString::number(countOfNeighbourBombs));
+    if(displayIfZero) {
+        if(countOfNeighbourBombs == 0 && bombChecked[row*columns+column] == false) {
+            squares[row*columns+column]->setText(QString::number(countOfNeighbourBombs));
+            squares[row*columns+column]->setEnabled(false);
+            bombChecked[row*columns+column] = true;
+        }
+    }
+    else {
+        squares[row*columns+column]->setText(QString::number(countOfNeighbourBombs));
+        bombChecked[row*columns+column] = true;
+    }
 
-    //std::cout << "row:" << row << " column:" << column << std::endl;
+
+    if(countOfNeighbourBombs == 0) {
+        if(row > 0) {
+            if(column > 0)
+                checkBombCountAndDisplay(row-1, column-1, true);
+            if(column < columns-1)
+                checkBombCountAndDisplay(row-1, column+1, true);
+            checkBombCountAndDisplay(row-1, column, true);
+        }
+        if(column > 0)
+            checkBombCountAndDisplay(row, column-1, true);
+        if(column < columns-1)
+            checkBombCountAndDisplay(row, column+1, true);
+        if(row < rows-1) {
+            if(column > 0)
+                checkBombCountAndDisplay(row+1, column-1, true);
+            if(column < columns-1)
+                checkBombCountAndDisplay(row+1, column+1, true);
+            checkBombCountAndDisplay(row+1, column, true);
+
+        }
+    }
 }

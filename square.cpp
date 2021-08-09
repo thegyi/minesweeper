@@ -1,11 +1,9 @@
 #include "square.h"
 #include "qpushbutton.h"
-#include <iostream>
 
 square::square(int row, int column, QWidget *parent) : QPushButton(parent) , isBomb(false), row(row), column(column)
 {  
-    connect(this, &QPushButton::released, this, &square::handleButtonClick);
-    std::cout << row << "," << column <<std::endl;
+    installEventFilter(this);
     setFixedSize(QSize(40,40));
 }
 
@@ -19,10 +17,20 @@ bool square::getBomb()
     return isBomb;
 }
 
-void square::handleButtonClick()
+bool square::eventFilter(QObject *, QEvent *event)
 {
-    QString result = isBomb? "Bomb": QString::number(row)+":"+QString::number(column);
-    setText(result);
-    setEnabled(false);
-    emit onClick(result);
+    if (event->type() == QEvent::MouseButtonPress) {
+        QMouseEvent *keyEvent = static_cast<QMouseEvent *>(event);
+        if (keyEvent->button() == Qt::RightButton) {
+            setText("B!");
+            return true;
+        }
+        if(keyEvent->button() == Qt::LeftButton) {
+            QString result = isBomb? "Bomb": QString::number(row)+":"+QString::number(column);
+            //setText(result);
+            setEnabled(false);
+            emit onClick(result);
+        }
+    }
+    return false;
 }

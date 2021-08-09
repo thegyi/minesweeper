@@ -13,6 +13,8 @@ public:
     Board(int rowCount, int columnCount, int bombs);
     ~Board();
     std::vector<square*> squares;
+    std::vector<bool> bombChecked;
+    void checkBombCountAndDisplay(int row, int column, bool displayIfZero = false);
 
 private:
     int rows;
