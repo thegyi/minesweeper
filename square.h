@@ -16,12 +16,16 @@ public:
     bool eventFilter(QObject *object, QEvent *event);
     void setCounter(int value);
     int getCounter();
-    void showNumber();
+    void showNumber(bool showBombs=false);
+    bool isClicked;
+    bool markedAsBomb;
 private:
     bool isBomb;
     int row;
     int column;
     int counter;
+
+
 
 signals:
     void onClick(QString position);

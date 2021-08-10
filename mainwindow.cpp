@@ -3,6 +3,7 @@
 #include <QLayout>
 #include <QMessageBox>
 #include <QRect>
+#include <QTime>
 
 #include <iostream>
 
@@ -11,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    myboard = new Board(20, 20, 75);
+    myboard = new Board(20, 20, 30);
     QLayout *layout = ui->centralwidget->layout();
     layout->addWidget(myboard);
     connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
@@ -23,24 +24,29 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
 void MainWindow::handleClick(QString value)
 {
+    delay();
     if(myboard->checkEnd()) {
         QMessageBox msgBox;
         if(myboard->checkWin())
             msgBox.setText("WIN");
         else
-            msgBox.setText("END");
+            msgBox.setText("LOOSE");
         msgBox.exec();
         return;
     }
-    if(value == "B!") {
-        setWindowTitle(QString::number(myboard->markedAsBomb));
-        return;
+    if(value == "Bomb") {
+        myboard->showAllValues();
     }
-    QMessageBox msgBox;
-    msgBox.setText(value);
-    msgBox.exec();
+    //std::cout << value.toStdString()<<std::endl;
 }
 
 void MainWindow::on_action10x10_triggered()

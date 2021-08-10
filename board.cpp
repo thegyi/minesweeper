@@ -2,16 +2,16 @@
 #include <QGridLayout>
 #include <iostream>
 
-Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(columnCount), countOfBombs(bombs), markedAsBomb(0)
+Board::Board(int rowCount, int columnCount, int bombCount):rows(rowCount), columns(columnCount), countOfBombs(bombCount)
 {
     for(int i = 0; i < rows*columns; i++) {
         bombChecked.push_back(false);
         if(i < countOfBombs)
-            Bombs.push_back(true);
+            bombs.push_back(true);
         else
-            Bombs.push_back(false);
+            bombs.push_back(false);
     }
-    std::random_shuffle(Bombs.begin(), Bombs.end());
+    std::random_shuffle(bombs.begin(), bombs.end());
 
     QGridLayout *layout = new QGridLayout(this);
     int row = 0;
@@ -22,7 +22,12 @@ Board::Board(int rowCount, int columnCount, int bombs):rows(rowCount), columns(c
             column = 0;
         }
         square *tmp = new square(row, column, this);
-        if(Bombs[i])
+        QImage image(":/images/default.png");
+        QPixmap pixmap = QPixmap::fromImage(image);
+        QIcon ButtonIcon(pixmap);
+        tmp->setIcon(ButtonIcon);
+        tmp->setIconSize(QSize(40,40));
+        if(bombs[i])
             tmp->setBomb(true);
         squares.push_back(tmp);
         layout->addWidget(tmp, row, column);
@@ -57,14 +62,10 @@ Board::~Board()
 void Board::handleClick(QString value)
 {
     if(value == "B!") {
-        markedAsBomb++;
-        //setWindowTitle(QString::number(markedAsBomb));
         emit onClick(value);
         return;
     }
     if(value == "-B!") {
-        markedAsBomb--;
-        //setWindowTitle(QString::number(markedAsBomb));
         emit onClick("B!");
         return;
     }
@@ -87,17 +88,18 @@ void Board::checkBombCountAndDisplay(int row, int column, bool displayIfZero)
     int countOfNeighbourBombs = calculateNumber(row, column);
 
     if(displayIfZero) {
-        if(countOfNeighbourBombs == 0 && bombChecked[row*columns+column] == false) {
+        if(/*countOfNeighbourBombs == 0 &&*/ bombChecked[row*columns+column] == false) {
             squares[row*columns+column]->showNumber();//setText(QString::number(countOfNeighbourBombs));
-            squares[row*columns+column]->setEnabled(false);
+            //squares[row*columns+column]->setEnabled(false);
             bombChecked[row*columns+column] = true;
+            squares[row*columns+column]->isClicked = true;
         }
     }
     else {
         squares[row*columns+column]->showNumber();//setText(QString::number(countOfNeighbourBombs));
         bombChecked[row*columns+column] = true;
+        squares[row*columns+column]->isClicked = true;
     }
-
 
     if(countOfNeighbourBombs == 0) {
         if(row > 0) {
@@ -153,7 +155,7 @@ int Board::calculateNumber(int row, int column)
 bool Board::checkEnd()
 {
     for(unsigned int i = 0; i < squares.size(); ++i) {
-        if(squares[i]->text() == "")
+        if(squares[i]->isClicked == false)
             return false;
     }
     return true;
@@ -162,15 +164,22 @@ bool Board::checkEnd()
 bool Board::checkWin()
 {
     for(unsigned int i = 0; i < squares.size(); ++i) {
-        if(squares[i]->text() == "B!") {
-            if(Bombs[i] == false) {
+        if(squares[i]->markedAsBomb) {
+            if(bombs[i] == false) {
                 return false;
             }
         } else {
-            if(Bombs[i] == true){
+            if(bombs[i] == true){
                 return false;
             }
         }
     }
     return true;
+}
+
+void Board::showAllValues()
+{
+    for(unsigned int i = 0; i < squares.size(); ++i) {
+        squares[i]->showNumber(true);
+    }
 }

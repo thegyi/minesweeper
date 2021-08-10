@@ -13,17 +13,18 @@ public:
     Board(int rowCount, int columnCount, int bombs);
     ~Board();
     std::vector<square*> squares;
-    std::vector<bool> Bombs;
+    std::vector<bool> bombs;
     std::vector<bool> bombChecked;
     void checkBombCountAndDisplay(int row, int column, bool displayIfZero = false);
-    int markedAsBomb;
     bool checkEnd();
     bool checkWin();
+    void showAllValues();
 
 private:
     int rows;
     int columns;
     int countOfBombs;
+
     int calculateNumber(int row, int column);
 
 public slots:
