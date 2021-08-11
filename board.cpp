@@ -1,6 +1,8 @@
 #include "board.h"
 #include <QGridLayout>
 #include <iostream>
+#include <QTime>
+#include <QApplication>
 
 Board::Board(int rowCount, int columnCount, int bombCount):rows(rowCount), columns(columnCount), countOfBombs(bombCount)
 {
@@ -152,13 +154,31 @@ int Board::calculateNumber(int row, int column)
     return countOfNeighbourBombs;
 }
 
+void delay()
+{
+    QTime dieTime= QTime::currentTime().addSecs(1);
+    while (QTime::currentTime() < dieTime)
+        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
 bool Board::checkEnd()
 {
+    int countOfClicked = 0;
     for(unsigned int i = 0; i < squares.size(); ++i) {
-        if(squares[i]->isClicked == false)
-            return false;
+        if(squares[i]->isClicked)
+            countOfClicked++;
     }
-    return true;
+    if( (rows*columns) - countOfClicked < 2)
+        delay();
+    countOfClicked = 0;
+    for(unsigned int i = 0; i < squares.size(); ++i) {
+            if(squares[i]->isClicked)
+                countOfClicked++;
+        }
+    if(countOfClicked == rows*columns)
+        return true;
+    else
+        return false;
 }
 
 bool Board::checkWin()

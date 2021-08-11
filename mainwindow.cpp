@@ -24,16 +24,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void delay()
-{
-    QTime dieTime= QTime::currentTime().addSecs(1);
-    while (QTime::currentTime() < dieTime)
-        QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
-}
+
 
 void MainWindow::handleClick(QString value)
 {
-    delay();
+    //delay();
     if(myboard->checkEnd()) {
         QMessageBox msgBox;
         if(myboard->checkWin())
