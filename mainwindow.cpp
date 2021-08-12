@@ -12,58 +12,54 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    myboard = new Board(20, 20, 30);
+    mineBoard = new Board(20, 20, 50);
     QLayout *layout = ui->centralwidget->layout();
-    layout->addWidget(myboard);
-    connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
+    layout->addWidget(mineBoard);
+    connect(mineBoard, &Board::onClick, this, &MainWindow::handleClick);
 }
 
 MainWindow::~MainWindow()
 {
-    delete myboard;
+    delete mineBoard;
     delete ui;
 }
 
-
-
 void MainWindow::handleClick(QString value)
 {
-    //delay();
-    if(myboard->checkEnd()) {
+    std::cout << "MainWindow::handleClick" << std::endl;
+    if(mineBoard->getGameResult()) {
         QMessageBox msgBox;
-        if(myboard->checkWin())
+        if(mineBoard->isWin())
             msgBox.setText("WIN");
         else
             msgBox.setText("LOOSE");
+        mineBoard->setAllCellDisable();
         msgBox.exec();
         return;
     }
     if(value == "Bomb") {
-        myboard->showAllValues();
+        mineBoard->showAllValues();
     }
-    //std::cout << value.toStdString()<<std::endl;
 }
 
 void MainWindow::on_action10x10_triggered()
 {
-    if(myboard)
-        delete myboard;
-    myboard = new Board(10,10,20);
+    if(mineBoard)
+        delete mineBoard;
+    mineBoard = new Board(10,10,50);
     QLayout *layout = ui->centralwidget->layout();
-    layout->addWidget(myboard);
+    layout->addWidget(mineBoard);
     layout->setGeometry(QRect(0,0,300,300));
-    connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
+    connect(mineBoard, &Board::onClick, this, &MainWindow::handleClick);
 }
-
 
 void MainWindow::on_action20x20_triggered()
 {
-    if(myboard)
-        delete myboard;
-    myboard = new Board(20,20,70);
+    if(mineBoard)
+        delete mineBoard;
+    mineBoard = new Board(20,20,70);
     QLayout *layout = ui->centralwidget->layout();
-    layout->addWidget(myboard);
+    layout->addWidget(mineBoard);
     layout->setGeometry(QRect(0,0,500,500));
-    connect(myboard, &Board::onClick, this, &MainWindow::handleClick);
+    connect(mineBoard, &Board::onClick, this, &MainWindow::handleClick);
 }
-

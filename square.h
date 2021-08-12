@@ -17,8 +17,9 @@ public:
     void setCounter(int value);
     int getCounter();
     void showNumber(bool showBombs=false);
-    bool isClicked;
+    bool imageIsDisplayed;
     bool markedAsBomb;
+    bool bombChecked;
 private:
     bool isBomb;
     int row;

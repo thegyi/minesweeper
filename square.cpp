@@ -2,12 +2,11 @@
 #include "qpushbutton.h"
 #include <iostream>
 
-square::square(int row, int column, QWidget *parent) : QPushButton(parent) , isBomb(false), row(row), column(column)
+square::square(int row, int column, QWidget *parent) : QPushButton(parent) ,
+    imageIsDisplayed(false),markedAsBomb(false), bombChecked(false),isBomb(false), row(row), column(column), counter(0)
 {  
     installEventFilter(this);
     setFixedSize(QSize(40,40));
-    markedAsBomb = false;
-    isClicked = false;
 }
 
 void square::setBomb(bool value)
@@ -26,14 +25,13 @@ bool square::eventFilter(QObject *, QEvent *event)
         QMouseEvent *keyEvent = static_cast<QMouseEvent *>(event);
         if (keyEvent->button() == Qt::RightButton) {
             if(markedAsBomb) {
-                //setText("-");
                 QImage image(":/images/default.png");
                 QPixmap pixmap = QPixmap::fromImage(image);
                 QIcon ButtonIcon(pixmap);
                 setIcon(ButtonIcon);
                 setIconSize(QSize(50,50));
                 markedAsBomb = false;
-                isClicked = false;
+                imageIsDisplayed = false;
                 emit onClick("-B!");
                 return true;
             }
@@ -44,14 +42,13 @@ bool square::eventFilter(QObject *, QEvent *event)
                 setIcon(ButtonIcon);
                 setIconSize(QSize(50,50));
                 markedAsBomb = true;
-                isClicked = true;
-                //setText("B!");
+                imageIsDisplayed = true;
                 emit onClick("B!");
                 return true;
             }
         }
         if(keyEvent->button() == Qt::LeftButton) {
-            isClicked = true;
+            imageIsDisplayed = true;
             QString result = isBomb? "Bomb": QString::number(row)+":"+QString::number(column);
             if(result == "Bomb") {
                 QImage image(":/images/bomb.png");
@@ -84,6 +81,7 @@ void square::showNumber(bool showBombs)
         QIcon ButtonIcon(pixmap);
         setIcon(ButtonIcon);
         setIconSize(QSize(50,50));
+        imageIsDisplayed = true;
     }
     if(showBombs && isBomb) {
         QImage image(":/images/bomb.png");
@@ -91,7 +89,6 @@ void square::showNumber(bool showBombs)
         QIcon ButtonIcon(pixmap);
         setIcon(ButtonIcon);
         setIconSize(QSize(50,50));
+        imageIsDisplayed = true;
     }
-    //std::cout << counter << std::endl;
-    //setText(QString::number(counter));
 }

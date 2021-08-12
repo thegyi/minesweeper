@@ -12,20 +12,24 @@ class Board : public QWidget
 public:
     Board(int rowCount, int columnCount, int bombs);
     ~Board();
+
     std::vector<square*> squares;
     std::vector<bool> bombs;
-    std::vector<bool> bombChecked;
-    void checkBombCountAndDisplay(int row, int column, bool displayIfZero = false);
-    bool checkEnd();
-    bool checkWin();
+
+    void getBombCountAndDisplay(int row, int column, bool displayIfZero = false);
+    bool getGameResult();
     void showAllValues();
+    unsigned int getCountOfClickedCells();
+    void setAllCellDisable();
+    bool isWin();
 
 private:
     int rows;
     int columns;
     int countOfBombs;
 
-    int calculateNumber(int row, int column);
+    int calculateNeighbourNumber(int row, int column);
+
 
 public slots:
     void handleClick(QString value);
