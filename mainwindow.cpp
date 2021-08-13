@@ -12,7 +12,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    mineBoard = new Board(20, 20, 50);
+    mineBoard = new Board(20, 20, 40);
     QLayout *layout = ui->centralwidget->layout();
     layout->addWidget(mineBoard);
     connect(mineBoard, &Board::onClick, this, &MainWindow::handleClick);

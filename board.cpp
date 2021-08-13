@@ -14,9 +14,21 @@ Board::Board(int rowCount, int columnCount, int bombCount):rows(rowCount), colum
         else
             bombs.push_back(false);
     }
-    int round = rand() % 10;
+
+    /*int round = rand() % 10;
     for(int i = 0; i < round; i++)
-        std::random_shuffle(bombs.begin(), bombs.end());
+        std::random_shuffle(bombs.begin(), bombs.end());*/
+    int round = 10;
+    for(int i = 0; i < round; i++) {
+        for(int j = 0; j < rows*columns; j++) {
+            int pos1 = rand()%(rows*columns);
+            int pos2 = rand()%(rows*columns);
+            bool tmp = bombs[pos1];
+            bombs[pos1] = bombs[pos2];
+            bombs[pos2] = tmp;
+        }
+    }
+
 
     QGridLayout *layout = new QGridLayout(this);
     int row = 0;
